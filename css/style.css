@@ -7,6 +7,12 @@ header {
   z-index: 1;
 }
 
+#registerForm, #loginForm {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
 figure {
   background: white;
   -webkit-box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
@@ -16,13 +22,6 @@ figure {
   transition: all .3s linear;
 }
 
-/* figure:hover{
-    transform: rotateY(90deg);
-}
-figure:hover + div.overview{
-    transform: rotateY(0deg);
-}
- */
 #movieList article {
   display: inline-block;
   position: relative;

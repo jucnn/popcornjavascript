@@ -22,6 +22,10 @@ figure {
   transition: all .3s linear;
 }
 
+.hidden {
+  display: none !important;
+}
+
 #movieList article {
   display: inline-block;
   position: relative;

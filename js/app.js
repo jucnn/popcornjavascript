@@ -24,8 +24,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const userEmailLogin = document.querySelector("#userEmailLogin");
   const userPasswordLogin = document.querySelector("#userPasswordLogin");
 
+  const mainNav = document.querySelector("header nav");
+
+  ////Favorite
 
   // Fonctions
+
+  const checkUserToken = token => {
+    return new Promise((resolve, reject) => {
+      fetch(`${apiURL}/api/me/${token}`)
+        .then(response => {
+          return response.ok ? response.json() : "Response not OK";
+        })
+        .then(jsonData => resolve(jsonData))
+        .catch(err => reject(err));
+    });
+  };
 
   const getFormRegister = () => {
     registerForm.addEventListener("submit", event => {
@@ -64,6 +78,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
+  const getFavorite = () => {
+    const favoriteButton = document.querySelector("#favoriteButton");
+
+    favoriteButton.addEventListener("click", event => {
+      event.preventDefault();
+      let movieId = favoriteButton.getAttribute("favorite-id");
+      let movieName = favoriteButton.getAttribute("favorite-name");
+
+      const dataFavorite = {
+        author: localStorage.getItem("author"),
+        id: movieId,
+        name: movieName
+      };
+
+      console.log(dataFavorite);
+      fetchForm("favorite", dataFavorite);
+    });
+  };
+
   const fetchForm = (endpoint, data) => {
     let url = `${apiURL}/api/${endpoint}`;
 
@@ -80,7 +113,13 @@ document.addEventListener("DOMContentLoaded", () => {
         return response.ok ? response.json() : "Response not OK";
       })
       .then(jsonData => {
-        console.log(jsonData);
+        if (endpoint != "favorite") {
+          let author = jsonData.data.identity._id;
+          localStorage.setItem("author", author);
+          console.log(jsonData);
+        } else {
+          console.log(jsonData);
+        }
       })
       .catch(err => console.error(err));
   };
@@ -90,7 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
       event.preventDefault();
 
       searchData.value.length > 0
-        ? fetchFunction(searchData.value)
+        ? fetchMovie(searchData.value)
         : displayError(searchData, "Minimum 1 caractère couillon");
     });
   };
@@ -100,7 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
     tag.addEventListener("focus", () => (searchLabel.textContent = ""));
   };
 
-  const fetchFunction = (keywords, index = 1) => {
+  const fetchMovie = (keywords, index = 1) => {
     let fetchURL = null;
 
     typeof keywords === "number"
@@ -155,7 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let link of linkCollection) {
       link.addEventListener("click", () => {
         // + equal to Parse Int or Parse Float
-        fetchFunction(+link.getAttribute("movie-id"));
+        fetchMovie(+link.getAttribute("movie-id"));
       });
     }
   };
@@ -170,6 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <h2> ${data.original_title} </h2>
             <p>${data.overview}</p>
             <button>Voir en streaming</button>
+            <button id="favoriteButton" favorite-name="${data.original_title}" favorite-id="${data.id}">Favoris</button>
             <button id="closeButton"> Close </button>
 
         </div>
@@ -177,6 +217,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     moviePopin.parentElement.classList.add("open");
     closePopin(document.querySelector("#closeButton"));
+    getFavorite();
   };
 
   const closePopin = button => {
@@ -193,9 +234,38 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
+  const displayNav = pseudo => {
+    mainNav.innerHTML = `
+            <h1>Hello ${pseudo}</h1>
+            <button>Home</button>
+            <button>Favorite</button>
+            <button id="buttonLogout">Logout</button>
+        `;
+
+    mainNav.classList.remove("hidden");
+
+    document.querySelector("#buttonLogout").addEventListener("click", () => {
+      localStorage.clear();
+      document.querySelector("header nav").innerHTML = "";
+      registerForm.classList.remove("hidden");
+      loginForm.classList.remove("hidden");
+    });
+  };
+
   getSearchSubmit();
 
   getFormRegister();
 
   getFormLogin();
+
+  if (localStorage.getItem("author") !== null) {
+    checkUserToken(localStorage.getItem("author"))
+      .then(response => {
+        console.log(response);
+        registerForm.classList.add("hidden");
+        loginForm.classList.add("hidden");
+        displayNav(response.data.user.pseudo);
+      })
+      .catch(err => console.log(err));
+  }
 });

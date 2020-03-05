@@ -3,7 +3,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   // Déclarations
 
-  const searchForm = document.querySelector("header form");
+  const searchForm = document.querySelector("#searchForm");
   const searchLabel = document.querySelector("header form span");
   const searchData = document.querySelector('[name="searchData"]');
   const themoviedbURL =
@@ -12,13 +12,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const movieList = document.querySelector("#movieList");
   const moviePopin = document.querySelector("#moviePopin article");
+
+  ////Register Form
   const registerForm = document.querySelector("#registerForm");
-  const loginForm = document.querySelector("#registerForm");
   const userEmail = document.querySelector("#userEmail");
   const userPassword = document.querySelector("#userPassword");
   const userName = document.querySelector("#userName");
+
+  ////Login Form
+  const loginForm = document.querySelector("#loginForm");
   const userEmailLogin = document.querySelector("#userEmailLogin");
   const userPasswordLogin = document.querySelector("#userPasswordLogin");
+
 
   // Fonctions
 
